@@ -1,0 +1,2766 @@
+ // TESTS ON COURSE QUERIES
+//
+//
+//     it('(course_avg > 90 AND adhe) OR courses_avg == 95', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(56);
+//                 for (let i: number = 0; i < returnarray.length; i++) {
+//                     if (i < 14 || i == 55) {
+//                         expect(returnarray[i]['courses_dept']).to.equal('adhe');
+//                     }
+//                     else {
+//                         expect(returnarray[i]['courses_avg']).to.equal(95);
+//                     }
+//                 }
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//               //  console.log(err);
+//             })
+//     });
+//
+//
+//     it('TEST equals audit 7 AND greater than 80% avg', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "GT": {
+//                             "courses_avg": 80
+//                         }
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_fail": 7
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg",
+//                     "courses_fail"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 //console.log(returnarray);
+//                 expect(returnarray.length).to.equal(7);
+//                 expect(returnarray[0]["courses_dept"]).to.equal("eosc");
+//                 expect(returnarray[0]["courses_avg"]).to.equal(80.08);
+//                 expect(returnarray[2]["courses_dept"] && returnarray[3]["courses_dept"]).to.equal("grsj");
+//                 expect(returnarray[4]["courses_avg"]).to.equal(81.68);
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('TEST less than 98 AND greater than 97.5', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "GT": {
+//                             "courses_avg": 97.5
+//                         }
+//                     },
+//                     {
+//                         "LT": {
+//                             "courses_avg": 98
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//               //  console.log(returnarray);
+//                 expect(returnarray.length).to.equal(5);
+//                 expect(returnarray[1]["courses_avg"]).to.equal(97.53);
+//                 expect(returnarray[4]["courses_avg"]).to.equal(97.78);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it(' find all sections not from a specific prof', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "NOT": {
+//                             "IS": {
+//                                 "courses_instructor": "acton, donald"
+//                             }
+//                         }
+//                     },
+//                     {
+//                         "IS": {
+//                             "courses_dept": "cpsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_instructor",
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_title"
+//                 ],
+//                 "ORDER": "courses_title",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 for (let i: number = 0; i < returnarray.length; i++) {
+//                     // make sure that it got everything other than Acton
+//                     expect(returnarray[i]['course_instructor']).not.equal('acton, donald');
+//                 }
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+//     it("find all sections for a dept", function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_dept": "aanb"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 //console.log('successful query');
+//                 //expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 //console.log(returnarray);
+//                 expect(returnarray.length).to.equal(4);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 //console.log('find all sections for a dept: ' + err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('Testing Valid Query - empty WHERE', function () {
+//         let query = {
+//             WHERE: {},
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//
+//     it('test EQ and course_year', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "EQ": {
+//                     "courses_year": 2009
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg",
+//                     "courses_year"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                // console.log(returnarray.length)
+//                 //console.log(returnarray)
+//                 expect(returnarray.length).to.equal(3950);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 //   console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//
+//     it('Testing GT - Basic case', function () {
+//         let query = {
+//             WHERE: {
+//                 GT: {courses_avg: 97},
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing LT - Basic case', function () {
+//         let query = {
+//             WHERE: {
+//                 LT: {courses_avg: 50},
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//
+//     it('Testing IS - Basic case', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_dept": "cpsc"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray[0]['courses_avg'] && returnarray[1]['courses_avg']).to.equal(64);
+//                 expect(returnarray[2]['courses_avg']).to.equal(64.62);
+//                 console.log(returnarray.length)
+//                 expect(returnarray.length).to.equal(1111);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing IS - Not a course - Valid but returns nothing', function () {
+//         let query = {
+//             WHERE: {
+//                 IS: {courses_dept: 'a'}
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 //console.log('Body: ' + value.body);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing *IS*', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_dept": "*fs*"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray[0]['courses_avg'] && returnarray[1]['courses_avg']).to.equal(0);
+//                 expect(returnarray[2]['courses_avg']).to.equal(69.96);
+//                 //console.log(returnarray.length)
+//                 expect(returnarray.length).to.equal(145);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('Testing *IS', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_dept": "*rds"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray[0]['courses_avg']).to.equal(53.64);
+//                 expect(returnarray[1]['courses_avg']).to.equal(55.63);
+//                 expect(returnarray[2]['courses_avg']).to.equal(57.21);
+//                 console.log(returnarray.length)
+//                 expect(returnarray.length).to.equal(141);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing IS*', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_dept": "phy*"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray[0]['courses_avg']).to.equal(55.25);
+//                 expect(returnarray[1]['courses_avg']).to.equal(62);
+//                 expect(returnarray[2]['courses_avg']).to.equal(62);
+//                 console.log(returnarray.length)
+//                 expect(returnarray.length).to.equal(1091);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing IS - *Stri*ng', function () {
+//         let query = {
+//             WHERE: {
+//                 IS: {courses_dept: '*p*n'}
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing NOT - not GT', function () {
+//         let query = {
+//             WHERE: {
+//                 NOT: {
+//                     GT: {courses_avg: 70}
+//                 },
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('Testing NOT - not LT', function () {
+//         let query = {
+//             WHERE: {
+//                 NOT: {
+//                     LT: {courses_pass: 7}
+//                 },
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_pass'],
+//                 ORDER: "courses_pass",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Further AND tests', function () {
+//         let query = {
+//             WHERE: {
+//                 AND: [
+//                     {GT: {"courses_avg": 90}},
+//                     {GT: {"courses_avg": 90}}
+//                 ]
+//
+//             },
+//             OPTIONS: {
+//                 COLUMNS: [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(3127);
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('Testing NOT - not IS', function () {
+//         let query = {
+//             WHERE: {
+//                 NOT: {
+//                     IS: {courses_dept: "aanb"}
+//                 },
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_dept",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 console.log('Code: ' + value.code);
+//                 //expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing NOT - not IS *string*', function () {
+//         let query = {
+//             WHERE: {
+//                 NOT: {
+//                     IS: {courses_instructor: "*john*"}
+//                 },
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_instructor',
+//                     'courses_avg'],
+//                 ORDER: "courses_instructor",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing NOT - not IS *string', function () {
+//         let query = {
+//             WHERE: {
+//                 NOT: {
+//                     IS: {courses_dept: "*pn"}
+//                 },
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_dept",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing NOT - not IS string*', function () {
+//         let query = {
+//             WHERE: {
+//                 NOT: {
+//                     IS: {courses_dept: "cp*"}
+//                 },
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_dept",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 //  console.log(err);
+//                 expect.fail();
+//             })
+//
+//     });
+//
+//
+//     it('Testing AND - GT + IS', function () {
+//         let query = {
+//             WHERE: {
+//                 AND: [
+//                     {
+//                         GT: {
+//                             courses_avg: 70
+//                         }
+//                     },
+//                     {
+//                         IS: {
+//                             courses_dept: "asia"
+//                         }
+//                     }
+//                 ]
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 //  console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('Testing OR - GT + IS', function () {
+//         let query = {
+//             WHERE: {
+//                 OR: [
+//                     {
+//                         GT: {
+//                             courses_avg: 90
+//                         }
+//                     },
+//                     {
+//                         IS: {
+//                             courses_dept: "japn"
+//                         }
+//                     }
+//                 ]
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('Testing complex', function () {
+//         let query = {
+//
+//             WHERE: {
+//                 OR: [
+//                     {
+//                         AND: [
+//                             {
+//                                 GT: {
+//                                     courses_avg: 90
+//                                 }
+//                             },
+//                             {
+//                                 IS: {
+//                                     courses_dept: "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         EQ: {
+//                             courses_avg: 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             OPTIONS: {
+//                 COLUMNS: [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//             }).catch(function (err: CourseResp) {
+//                 //  console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('course_avg greater than 98', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "GT": {
+//                     "courses_avg": 98
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(25);
+//                 expect(returnarray[0]['courses_avg']).to.equal(98.08);
+//                 expect(returnarray[1]['courses_dept']).to.equal("nurs");
+//                 expect(returnarray[24]['courses_avg']).to.equal(99.78);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 //   console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('find all instructors with the same partial name', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_instructor": "*kim*"
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_instructor",
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_instructor",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 for (let i: number = 0; i < returnarray.length; i++) {
+//                     // make sure that it got everything other than Acton
+//                     expect(returnarray[i]['course_instructor']).not.equal('acton,donald');
+//                 }
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('course_avg less than 9', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "LT": {
+//                     "courses_avg": 9
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(7);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('test not', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "NOT": {
+//                     "GT": {
+//                         "courses_avg": 1
+//                     }
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 // console.log(returnarray)
+//                 expect(returnarray.length).to.equal(4);
+//                 expect(returnarray[0]['courses_avg']).to.equal(0);
+//                 expect(returnarray[0]['courses_dept']).to.equal("frst");
+//                 expect(returnarray[3]['courses_avg']).to.equal(1);
+//                 expect(returnarray[3]['courses_dept']).to.equal("wood");
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('test double negation', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "NOT": {
+//                     "NOT": {
+//                         "LT": {
+//                             "courses_avg": 20
+//                         }
+//                     }
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 // console.log(returnarray)
+//                 expect(returnarray.length).to.equal(7);
+//                 expect(returnarray[0]['courses_avg']).to.equal(0);
+//                 expect(returnarray[0]['courses_dept']).to.equal("frst");
+//                 expect(returnarray[6]['courses_avg']).to.equal(4.5);
+//                 expect(returnarray[6]['courses_dept']).to.equal("fopr");
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('test triple negation', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "NOT": {
+//                     "NOT": {
+//                         "NOT": {
+//                             "LT": {
+//                                 "courses_avg": 20
+//                             }
+//                         }
+//                     }
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it('Test using OR to query different keys (elixir) - Small change in order ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "GT": {
+//                             "courses_pass": 100
+//                         }
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_audit": 4
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_pass",
+//                     "courses_dept",
+//                     "courses_audit"
+//                 ],
+//                 "ORDER": "courses_pass",
+//                 "FORM": "TABLE"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 // console.log(value.body);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 //  console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it("find all sections for a dept", function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "courses_dept": "aanb"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 //console.log('successful query');
+//                 //expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 expect(returnarray[0]['courses_id'] && returnarray[1]['courses_id']).to.equal('504');
+//                 expect(returnarray[1]['courses_id'] && returnarray[2]['courses_id']).to.equal('551');
+//                 expect(returnarray.length).to.equal(4);
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 //console.log('find all sections for a dept: ' + err);
+//                 expect.fail();
+//             })
+//     });
+//
+//     it('(course_avg > 90 AND adhe) OR courses_avg == 95', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(56);
+//                 for (let i: number = 0; i < returnarray.length; i++) {
+//                     if (i < 14 || i == 55) {
+//                         expect(returnarray[i]['courses_dept']).to.equal('adhe');
+//                     }
+//                     else {
+//                         expect(returnarray[i]['courses_avg']).to.equal(95);
+//                     }
+//                 }
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//             })
+//
+//     });
+//
+//     it(' find all courses from a dept except some examples  ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "comptn, progrmng"
+//                                     }
+//                                 }
+//                             },
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "func & logic prg"
+//                                     }
+//                                 }
+//                             }
+//                         ]
+//
+//
+//                     },
+//                     {
+//                         "IS": {
+//                             "courses_dept": "cpsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_instructor",
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_title"
+//                 ],
+//                 "ORDER": "courses_title",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//
+//                 returnarray = value.body['result'];
+//                 // console.log(returnarray)
+//                 expect(value.code).to.equal(200);
+//
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+// //NEW TESTS TO DEBUG IS AND NOT CASES
+//
+//     //test not
+//     it('NOT', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "NOT": {
+//                     "GT": {
+//                         "courses_avg": 1
+//                     }
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(4);
+//                 expect(returnarray[0]['courses_avg']).to.equal(0);
+//                 expect(returnarray[0]['courses_dept']).to.equal("frst");
+//                 expect(returnarray[3]['courses_avg']).to.equal(1);
+//                 expect(returnarray[3]['courses_dept']).to.equal("wood");
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+//     //  find all sections in a dept not taught by a specific person
+//     it('All sections in a dept NOT taught by a specific person', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//
+//                     {
+//                         "NOT": {
+//                             "IS": {
+//                                 "courses_instructor": "acton, donald"
+//                             }
+//                         }
+//                     },
+//                     {
+//                         "IS": {
+//                             "courses_dept": "cpsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_instructor",
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_instructor",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect(value.code).to.equal(200);
+//                 returnarray = value.body['result'];
+//                 expect(returnarray.length).to.equal(1085);
+//                 for (let i: number = 0; i < returnarray.length; i++) {
+//                     // make sure that it got everything other than Acton
+//                     expect(returnarray[i]['course_instructor']).not.equal('acton, donald');
+//                 }
+//             })
+//             .catch(function (err: any) {
+//                 expect.fail();
+//             })
+//     });
+//
+//
+// //START OF QUERRY ERROR TESTING
+//     console.log('QUERY ERROR TESTING STARTED')
+//
+//     it('NO OPTIONS INCLUDED', function () {
+//         return ifac.performQuery(({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             }
+//         }))
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('NO COLUMNS', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('NO VALUES IN COLUMNS ARRAY', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('NO VALUE GIVEN TO ORDER', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": '',
+//                 "FORM": "TABLE"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('FORM IS NOT INCLUDED AT ALL', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 66
+//                                 }
+//                             },
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "adhe"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_dept": "apsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('FORM SOMETHING NOT TABLE', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "OR": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "IS": {
+//                                     "courses_dept": "apsc"
+//                                 }
+//
+//                             },
+//                             {
+//                                 "GT": {
+//                                     "courses_avg": 90
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         "EQ": {
+//                             "courses_avg": 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "buttogram"
+//             }
+//
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('EMPTY AND CASE', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": []
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('INVALID KEYS TEST - IN ORDER', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "GT": {
+//                             "courses_avg": 97.5
+//                         }
+//                     },
+//                     {
+//                         "LT": {
+//                             "courses_avg": 98
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "WRONGKEYYY",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('EMPTY QUERY TEST', function () {
+//         return ifac.performQuery({})
+//             .then(function (value: any) {
+//                 expect.fail()
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('INVALID KEY - ORDERING BY SOMETHING NOT THERE', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//
+//                     {
+//                         "GT": {
+//                             "courses_avg": 97.5
+//                         }
+//                     },
+//                     {
+//                         "LT": {
+//                             "courses_avg": 98
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept"
+//                 ],
+//                 "ORDER": "courses_audit",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('test invalid keys - in AND statement', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//
+//                     {
+//                         "GT": {
+//                             "courses_arverage": 97.5
+//                         }
+//                     },
+//                     {
+//                         "LT": {
+//                             "courses_avg": 98
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_avg"
+//                 ],
+//                 "ORDER": "courses_avg",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it("INVALID WHERE PERAMETER", function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "IS": {
+//                     "": "aanb"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//
+//     it('Testing Invalid Query - No OPTIONS', function () {
+//         let query = {
+//             WHERE: {
+//                 EQ: {courses_avg: 50},
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - No WHERE', function () {
+//         let query = {
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(400);
+//
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - Where with only AND filter', function () {
+//         let query = {
+//             WHERE: {AND: {}},
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - Where with only OR filter', function () {
+//         let query = {
+//             WHERE: {OR: {}},
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect(value.code).to.equal(200);
+//
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - WHERE exist but empty COLUMNS', function () {
+//         let query = {
+//             WHERE: {},
+//             OPTIONS: {
+//                 COLUMNS: [{}],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - FORM is missing', function () {
+//         let query = {
+//             WHERE: {},
+//             OPTIONS: {
+//                 COLUMNS: [{}],
+//                 ORDER: "courses_avg",
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//
+//                 // console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - FORM is not TABLE', function () {
+//         let query = {
+//             WHERE: {},
+//             OPTIONS: {
+//                 COLUMNS: [{}],
+//                 ORDER: "courses_avg",
+//                 FORM: 'notTABLE'
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Query - COLUMN under OPTIONS are invalid', function () {
+//         let query = {
+//             WHERE: {},
+//             OPTIONS: {
+//                 COLUMNS: ["courses_de"],
+//                 ORDER: "courses_avg",
+//                 FORM: 'notTABLE'
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//
+//     it('Testing EQ - Invalid Column', function () {
+//         let query = {
+//             WHERE: {
+//                 EQ: {courses_avg: 50},
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['coes_dpt',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing EQ - value not a number', function () {
+//         let query = {
+//             WHERE: {
+//                 EQ: {courses_avg: "50"},
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('Testing GT - Invalid Column', function () {
+//         let query = {
+//             WHERE: {
+//                 GT: {courses_avg: 50},
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['coes_dpt',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing GT - value GT not a number', function () {
+//         let query = {
+//             WHERE: {
+//                 GT: {courses_avg: '50'},
+//             },
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//
+//
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid nested key should return 400', function () {
+//         let query = {
+//
+//             WHERE: {
+//                 OR: [
+//                     {
+//                         AND: [
+//                             {
+//                                 GT: {
+//                                     courses_avg: 90
+//                                 }
+//                             },
+//                             {
+//                                 IS: {
+//                                     courses_foo: "cpsc"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         EQ: {
+//                             courses_avg: 95
+//                         }
+//                     }
+//                 ]
+//             },
+//             OPTIONS: {
+//                 COLUMNS: [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect.fail();
+//             }).catch(function (err: CourseResp) {
+//                 //  console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Order - course_XXX', function () {
+//         let query = {
+//             WHERE: {
+//                 EQ: {courses_avg: 50},
+//             },
+//
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'
+//                 ],
+//                 ORDER: "courses_foo",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Testing Invalid Order - value is not a string', function () {
+//         let query = {
+//             WHERE: {
+//                 EQ: {courses_avg: 50},
+//             },
+//
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'
+//                 ],
+//                 ORDER: 6,
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect.fail();
+//
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//
+//
+//     it('Testing more than 1 filter in WHERE', function () {
+//         let query = {
+//             WHERE: {
+//                 AND: [
+//                     {
+//                         AND: [
+//                             {
+//                                 GT: {
+//                                     courses_avg: 90
+//                                 }
+//                             },
+//                             {
+//                                 IS: {
+//                                     courses_dept: "cpsc"
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     {
+//                         EQ: {
+//                             courses_avg: 95
+//                         }
+//                     },
+//                     {
+//                         LT: {
+//                             courses_avg: 40
+//                         }
+//                     }
+//                 ],
+//
+//                 LT: {courses_pass: 60}
+//             },
+//             OPTIONS: {
+//                 COLUMNS: [
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_avg"
+//                 ],
+//                 ORDER: "courses_avg",
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 // console.log('Code: ' + value.code);
+//                 expect.fail();
+//
+//             }).catch(function (err: CourseResp) {
+//                 //  console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//
+//
+//     it('Testing Invalid Order - value of order is not in column', function () {
+//         let query = {
+//             WHERE: {
+//                 EQ: {courses_avg: 50},
+//             },
+//
+//             OPTIONS: {
+//                 COLUMNS: ['courses_dept',
+//                     'courses_avg'
+//                 ],
+//                 ORDER: 'courses_title',
+//                 FORM: "TABLE"
+//             }
+//         }
+//
+//         return ifac.performQuery(query)
+//             .then(function (value: any) {
+//                 //console.log('Code: ' + value.code);
+//                 expect.fail();
+//
+//             }).catch(function (err: CourseResp) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test invalid column in LT', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "LT": {
+//                     "courses_de": 50
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test not a number in  in LT', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "LT": {
+//                     "courses_de": "50"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test invalid column in EQ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "EQ": {
+//                     "courses_de": 50
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('Test invalid if NOT EQ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "EQ": {"courses_de": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('Test not a string for IS', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "IS": {"courses_dept": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test if key in ORDEr id valid', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "IS": {"courses_dept": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_notaKey",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test if OPTIONS is Empty', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "IS": {"courses_dept": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {}
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test if NOT EQ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "EQ": {"courses_pass": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_pass",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_pass",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect(value.code).to.equal(200);
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect.fail();
+//             })
+//     });
+//
+//
+//     it(' Deep test for invalid column  ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "comptn, progrmng"
+//                                     }
+//                                 }
+//                             },
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "func & logic prg"
+//                                     }
+//                                 }
+//                             }
+//                         ]
+//
+//
+//                     },
+//                     {
+//                         "IS": {
+//                             "courses_dept": "cpsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_not",
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_title"
+//                 ],
+//                 "ORDER": "courses_title",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//
+//                 returnarray = value.body['result'];
+//                 // console.log(returnarray)
+//                 expect.fail();
+//
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     // it(' Deep test for LT not a number  ', function () {
+//     //     return ifac.performQuery({
+//     //         "WHERE": {
+//     //             "AND": [
+//     //                 {
+//     //                     "AND": [
+//     //                         {
+//     //                             "NOT": {
+//     //                                 "LT": {
+//     //                                     "courses_fail": "5"
+//     //                                 }
+//     //                             }
+//     //                         },
+//     //                         {
+//     //                             "NOT": {
+//     //                                 "IS": {
+//     //                                     "courses_title": "func & logic prg"
+//     //                                 }
+//     //                             }
+//     //                         }
+//     //                     ]
+//     //
+//     //
+//     //                 },
+//     //                 {
+//     //                     "IS": {
+//     //                         "courses_dept": "cpsc"
+//     //                     }
+//     //                 }
+//     //             ]
+//     //         },
+//     //         "OPTIONS": {
+//     //             "COLUMNS": [
+//     //                 "courses_not",
+//     //                 "courses_dept",
+//     //                 "courses_id",
+//     //                 "courses_title"
+//     //             ],
+//     //             "ORDER": "courses_title",
+//     //             "FORM": "TABLE"
+//     //         }
+//     //     })
+//     //         .then(function (value: any) {
+//     //
+//     //             returnarray = value.body['result'];
+//     //             //console.log(returnarray)
+//     //             expect.fail();
+//     //
+//     //         })
+//     //         .catch(function (err: any) {
+//     //             expect(err.code).to.equal(400);
+//     //         })
+//     // });
+//
+//     it('Test invalid column in LT', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "LT": {
+//                     "courses_de": 50
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test not a number in  in LT', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "LT": {
+//                     "courses_de": "50"
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 //  console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test invalid column in EQ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "EQ": {
+//                     "courses_de": 50
+//                 }
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test invalid if NOT EQ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "EQ": {"courses_de": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 //  console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//     it('Test not a string for IS', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "IS": {"courses_dept": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_id",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test if key in ORDEr id valid', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "IS": {"courses_dept": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_notaKey",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test if OPTIONS is Empty', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "IS": {"courses_dept": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_notaKey",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 // console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it('Test if NOT EQ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//
+//                 "NOT": {
+//                     "EQ": {"courses_pass": 50}
+//                 }
+//
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_dept",
+//                     "courses_id"
+//                 ],
+//                 "ORDER": "courses_notaKey",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//                 expect.fail();
+//             })
+//             .catch(function (err: any) {
+//                 //console.log(err);
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
+//
+//     it(' Deep test for invalid column  ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "comptn, progrmng"
+//                                     }
+//                                 }
+//                             },
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "func & logic prg"
+//                                     }
+//                                 }
+//                             }
+//                         ]
+//
+//
+//                     },
+//                     {
+//                         "IS": {
+//                             "courses_dept": "cpsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_not",
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_title"
+//                 ],
+//                 "ORDER": "courses_title",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//
+//                 returnarray = value.body['result'];
+//                 //console.log(returnarray)
+//                 expect.fail();
+//
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//     it(' Deep test for LT not a number  ', function () {
+//         return ifac.performQuery({
+//             "WHERE": {
+//                 "AND": [
+//                     {
+//                         "AND": [
+//                             {
+//                                 "NOT": {
+//                                     "LT": {
+//                                         "courses_fail": "5"
+//                                     }
+//                                 }
+//                             },
+//                             {
+//                                 "NOT": {
+//                                     "IS": {
+//                                         "courses_title": "func & logic prg"
+//                                     }
+//                                 }
+//                             }
+//                         ]
+//
+//
+//                     },
+//                     {
+//                         "IS": {
+//                             "courses_dept": "cpsc"
+//                         }
+//                     }
+//                 ]
+//             },
+//             "OPTIONS": {
+//                 "COLUMNS": [
+//                     "courses_not",
+//                     "courses_dept",
+//                     "courses_id",
+//                     "courses_title"
+//                 ],
+//                 "ORDER": "courses_title",
+//                 "FORM": "TABLE"
+//             }
+//         })
+//             .then(function (value: any) {
+//
+//                 returnarray = value.body['result'];
+//                 //console.log(returnarray)
+//                 expect.fail();
+//
+//             })
+//             .catch(function (err: any) {
+//                 expect(err.code).to.equal(400);
+//             })
+//     });
+//
+//
